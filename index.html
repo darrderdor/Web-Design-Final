@@ -1,0 +1,225 @@
+x   <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Asrama UNKLAB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .asrama-select {
+            display: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            display: none;
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🏠 UNKLAB</h1>
+            <p>Sistem Manajemen Asrama</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="role">Login Sebagai</label>
+                <select id="role" required>
+                    <option value="">Pilih Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="kepas">Kepala Asrama</option>
+                    <option value="mahasiswa">Mahasiswa</option>
+                </select>
+            </div>
+
+            <div class="form-group asrama-select" id="asramaGroup">
+                <label for="asrama">Pilih Asrama</label>
+                <select id="asrama">
+                    <option value="">Pilih Asrama</option>
+                    <option value="genset">Genset (Laki-laki)</option>
+                    <option value="crystal3">Crystal 3 (Laki-laki)</option>
+                    <option value="crystal2">Crystal 2 (Laki-laki)</option>
+                    <option value="crystal1">Crystal 1 (Laki-laki)</option>
+                    <option value="bougenville">Bougenville (Perempuan)</option>
+                    <option value="edelweis">Edelweis (Perempuan)</option>
+                    <option value="annex">Annex (Perempuan)</option>
+                    <option value="guesthouse">Guest House (Laki-laki)</option>
+                    <option value="jasmine1">Jasmine 1 (Perempuan)</option>
+                    <option value="jasmine2">Jasmine 2 (Perempuan)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required placeholder="Masukkan username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Masukkan password">
+            </div>
+
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+    </div>
+
+    <script>
+        // Data dummy untuk testing
+        const users = {
+            admin: { username: 'admin', password: 'admin123', role: 'admin' },
+            kepas_genset: { username: 'kepas1', password: 'kepas123', role: 'kepas', asrama: 'genset' },
+            mahasiswa1: { username: 'mhs001', password: 'mhs123', role: 'mahasiswa', asrama: 'genset', nama: 'John Doe', kamar: 'G-101', poin: 3, orkam: ['Jane Smith'] }
+        };
+
+        const roleSelect = document.getElementById('role');
+        const asramaGroup = document.getElementById('asramaGroup');
+        const asramaSelect = document.getElementById('asrama');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        roleSelect.addEventListener('change', function() {
+            if (this.value === 'kepas' || this.value === 'mahasiswa') {
+                asramaGroup.style.display = 'block';
+                asramaSelect.required = true;
+            } else {
+                asramaGroup.style.display = 'none';
+                asramaSelect.required = false;
+            }
+        });
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = roleSelect.value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const asrama = asramaSelect.value;
+
+            // Validasi login (dummy)
+            let isValid = false;
+            let userData = null;
+
+            if (role === 'admin' && username === 'admin' && password === 'admin123') {
+                isValid = true;
+                userData = users.admin;
+            } else if (role === 'kepas' && username === 'kepas1' && password === 'kepas123') {
+                isValid = true;
+                userData = users.kepas_genset;
+                userData.asrama = asrama;
+            } else if (role === 'mahasiswa' && username === 'mhs001' && password === 'mhs123') {
+                isValid = true;
+                userData = users.mahasiswa1;
+                userData.asrama = asrama;
+            }
+
+            if (isValid) {
+                // Simpan data user ke localStorage
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                
+                // Redirect berdasarkan role
+                if (role === 'admin') {
+                    window.location.href = 'admin-dashboard.html';
+                } else if (role === 'kepas') {
+                    window.location.href = 'kepas-dashboard.html';
+                } else if (role === 'mahasiswa') {
+                    window.location.href = 'mahasiswa-dashboard.html';
+                }
+            } else {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Username, password, atau role tidak sesuai!';
+            }
+        });
+    </script>
+</body>
+</html>

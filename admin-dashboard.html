@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Sistem Asrama UNKLAB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .btn {
+            padding: 6px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 5px;
+        }
+
+        .btn-edit {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏠 Dashboard Admin</h1>
+        <div class="user-info">
+            <span>Admin</span>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalMahasiswa">0</h3>
+                <p>Total Mahasiswa</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalAsrama">10</h3>
+                <p>Total Asrama</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalKamar">0</h3>
+                <p>Total Kamar</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('mahasiswa')">Kelola Mahasiswa</button>
+            <button class="tab-btn" onclick="switchTab('kamar')">Kelola Kamar</button>
+            <button class="tab-btn" onclick="switchTab('jadwal')">Jadwal Ibadah</button>
+            <button class="tab-btn" onclick="switchTab('peraturan')">Peraturan</button>
+        </div>
+
+        <div id="mahasiswa" class="tab-content active">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Daftar Mahasiswa</h2>
+                    <button class="btn btn-primary" onclick="openModal('addMahasiswa')">+ Tambah Mahasiswa</button>
+                </div>
+                <table id="tableMahasiswa">
+                    <thead>
+                        <tr>
+                            <th>NIM</th>
+                            <th>Nama</th>
+                            <th>Asrama</th>
+                            <th>Kamar</th>
+                            <th>Poin</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mahasiswaList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="kamar" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Daftar Kamar</h2>
+                    <button class="btn btn-primary" onclick="openModal('addKamar')">+ Tambah Kamar</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asrama</th>
+                            <th>Nomor Kamar</th>
+                            <th>Kapasitas</th>
+                            <th>Terisi</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kamarList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="jadwal" class="tab-content">
+            <div class="card">
+                <h2>Jadwal Ibadah</h2>
+                <form id="jadwalForm">
+                    <div class="form-group">
+                        <label>Midweek (Rabu)</label>
+                        <input type="time" id="midweek" value="19:00">
+                    </div>
+                    <div class="form-group">
+                        <label>Vesper (Jumat)</label>
+                        <input type="time" id="vesper" value="19:00">
+                    </div>
+                    <div class="form-group">
+                        <label>Sabat (Sabtu Pagi)</label>
+                        <input type="time" id="sabat" value="09:00">
+                    </div>
+                    <div class="form-group">
+                        <label>PA (Sabtu Sore)</label>
+                        <input type="time" id="pa" value="16:00">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="peraturan" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Peraturan Asrama</h2>
+                    <button class="btn btn-primary" onclick="openModal('addPeraturan')">+ Tambah Peraturan</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pelanggaran</th>
+                            <th>Poin</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="peraturanList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Mahasiswa -->
+    <div id="modalMahasiswa" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalMahasiswaTitle">Tambah Mahasiswa</h2>
+                <button class="btn-close" onclick="closeModal('modalMahasiswa')">&times;</button>
+            </div>
+            <form id="formMahasiswa">
+                <div class="form-group">
+                    <label>NIM</label>
+                    <input type="text" id="mhsNim" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" id="mhsNama" required>
+                </div>
+                <div class="form-group">
+                    <label>Asrama</label>
+                    <select id="mhsAsrama" required>
+                        <option value="">Pilih Asrama</option>
+                        <option value="Genset">Genset</option>
+                        <option value="Crystal 3">Crystal 3</option>
+                        <option value="Crystal 2">Crystal 2</option>
+                        <option value="Crystal 1">Crystal 1</option>
+                        <option value="Bougenville">Bougenville</option>
+                        <option value="Edelweis">Edelweis</option>
+                        <option value="Annex">Annex</option>
+                        <option value="Guest House">Guest House</option>
+                        <option value="Jasmine 1">Jasmine 1</option>
+                        <option value="Jasmine 2">Jasmine 2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Kamar</label>
+                    <input type="text" id="mhsKamar" required>
+                </div>
+                <div class="form-group">
+                    <label>Poin</label>
+                    <input type="number" id="mhsPoin" value="0" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Kamar -->
+    <div id="modalKamar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tambah Kamar</h2>
+                <button class="btn-close" onclick="closeModal('modalKamar')">&times;</button>
+            </div>
+            <form id="formKamar">
+                <div class="form-group">
+                    <label>Asrama</label>
+                    <select id="kamarAsrama" required>
+                        <option value="">Pilih Asrama</option>
+                        <option value="Genset">Genset</option>
+                        <option value="Crystal 3">Crystal 3</option>
+                        <option value="Crystal 2">Crystal 2</option>
+                        <option value="Crystal 1">Crystal 1</option>
+                        <option value="Bougenville">Bougenville</option>
+                        <option value="Edelweis">Edelweis</option>
+                        <option value="Annex">Annex</option>
+                        <option value="Guest House">Guest House</option>
+                        <option value="Jasmine 1">Jasmine 1</option>
+                        <option value="Jasmine 2">Jasmine 2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nomor Kamar</label>
+                    <input type="text" id="kamarNomor" required>
+                </div>
+                <div class="form-group">
+                    <label>Kapasitas</label>
+                    <input type="number" id="kamarKapasitas" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Peraturan -->
+    <div id="modalPeraturan" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tambah Peraturan</h2>
+                <button class="btn-close" onclick="closeModal('modalPeraturan')">&times;</button>
+            </div>
+            <form id="formPeraturan">
+                <div class="form-group">
+                    <label>Jenis Pelanggaran</label>
+                    <input type="text" id="pelanggaran" required>
+                </div>
+                <div class="form-group">
+                    <label>Poin</label>
+                    <input type="number" id="poinPelanggaran" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let mahasiswaData = JSON.parse(localStorage.getItem('mahasiswaData')) || [
+            { nim: 'MHS001', nama: 'John Doe', asrama: 'Genset', kamar: 'G-101', poin: 3 },
+            { nim: 'MHS002', nama: 'Jane Smith', asrama: 'Bougenville', kamar: 'B-201', poin: 0 }
+        ];
+
+        let kamarData = JSON.parse(localStorage.getItem('kamarData')) || [
+            { asrama: 'Genset', nomor: 'G-101', kapasitas: 2, terisi: 1 },
+            { asrama: 'Bougenville', nomor: 'B-201', kapasitas: 2, terisi: 1 }
+        ];
+
+        let peraturanData = JSON.parse(localStorage.getItem('peraturanData')) || [
+            { pelanggaran: 'Pulang lewat jam tutup asrama', poin: 1 },
+            { pelanggaran: 'Tidak mengikuti ibadah wajib', poin: 2 },
+            { pelanggaran: 'Membawa barang terlarang', poin: 5 }
+        ];
+
+        // Initialize
+        function init() {
+            loadMahasiswa();
+            loadKamar();
+            loadPeraturan();
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalMahasiswa').textContent = mahasiswaData.length;
+            document.getElementById('totalKamar').textContent = kamarData.length;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function openModal(type) {
+            if (type === 'addMahasiswa') {
+                document.getElementById('modalMahasiswa').classList.add('active');
+                document.getElementById('formMahasiswa').reset();
+            } else if (type === 'addKamar') {
+                document.getElementById('modalKamar').classList.add('active');
+                document.getElementById('formKamar').reset();
+            } else if (type === 'addPeraturan') {
+                document.getElementById('modalPeraturan').classList.add('active');
+                document.getElementById('formPeraturan').reset();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function loadMahasiswa() {
+            const tbody = document.getElementById('mahasiswaList');
+            tbody.innerHTML = '';
+            
+            mahasiswaData.forEach((mhs, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${mhs.nim}</td>
+                    <td>${mhs.nama}</td>
+                    <td>${mhs.asrama}</td>
+                    <td>${mhs.kamar}</td>
+                    <td>${mhs.poin}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick="editPoin(${index})">Edit Poin</button>
+                        <button class="btn btn-delete" onclick="deleteMahasiswa(${index})">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadKamar() {
+            const tbody = document.getElementById('kamarList');
+            tbody.innerHTML = '';
+            
+            kamarData.forEach((kamar, index) => {
+                const status = kamar.terisi < kamar.kapasitas ? 'Tersedia' : 'Penuh';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${kamar.asrama}</td>
+                    <td>${kamar.nomor}</td>
+                    <td>${kamar.kapasitas}</td>
+                    <td>${kamar.terisi}</td>
+                    <td>${status}</td>
+                    <td>
+                        <button class="btn btn-delete" onclick="deleteKamar(${index})">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadPeraturan() {
+            const tbody = document.getElementById('peraturanList');
+            tbody.innerHTML = '';
+            
+            peraturanData.forEach((rule, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${rule.pelanggaran}</td>
+                    <td>${rule.poin}</td>
+                    <td>
+                        <button class="btn btn-delete" onclick="deletePeraturan(${index})">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editPoin(index) {
+            const newPoin = prompt('Masukkan poin baru:', mahasiswaData[index].poin);
+            if (newPoin !== null) {
+                mahasiswaData[index].poin = parseInt(newPoin);
+                localStorage.setItem('mahasiswaData', JSON.stringify(mahasiswaData));
+                loadMahasiswa();
+            }
+        }
+
+        function deleteMahasiswa(index) {
+            if (confirm('Hapus mahasiswa ini?')) {
+                mahasiswaData.splice(index, 1);
+                localStorage.setItem('mahasiswaData', JSON.stringify(mahasiswaData));
+                loadMahasiswa();
+                updateStats();
+            }
+        }
+
+        function deleteKamar(index) {
+            if (confirm('Hapus kamar ini?')) {
+                kamarData.splice(index, 1);
+                localStorage.setItem('kamarData', JSON.stringify(kamarData));
+                loadKamar();
+                updateStats();
+            }
+        }
+
+        function deletePeraturan(index) {
+            if (confirm('Hapus peraturan ini?')) {
+                peraturanData.splice(index, 1);
+                localStorage.setItem('peraturanData', JSON.stringify(peraturanData));
+                loadPeraturan();
+            }
+        }
+
+        // Form submissions
+        document.getElementById('formMahasiswa').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newMhs = {
+                nim: document.getElementById('mhsNim').value,
+                nama: document.getElementById('mhsNama').value,
+                asrama: document.getElementById('mhsAsrama').value,
+                kamar: document.getElementById('mhsKamar').value,
+                poin: parseInt(document.getElementById('mhsPoin').value)
+            };
+            
+            mahasiswaData.push(newMhs);
+            localStorage.setItem('mahasiswaData', JSON.stringify(mahasiswaData));
+            loadMahasiswa();
+            updateStats();
+            closeModal('modalMahasiswa');
+        });
+
+        document.getElementById('formKamar').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newKamar = {
+                asrama: document.getElementById('kamarAsrama').value,
+                nomor: document.getElementById('kamarNomor').value,
+                kapasitas: parseInt(document.getElementById('kamarKapasitas').value),
+                terisi: 0
+            };
+            
+            kamarData.push(newKamar);
+            localStorage.setItem('kamarData', JSON.stringify(kamarData));
+            loadKamar();
+            updateStats();
+            closeModal('modalKamar');
+        });
+
+        document.getElementById('formPeraturan').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newRule = {
+                pelanggaran: document.getElementById('pelanggaran').value,
+                poin: parseInt(document.getElementById('poinPelanggaran').value)
+            };
+            
+            peraturanData.push(newRule);
+            localStorage.setItem('peraturanData', JSON.stringify(peraturanData));
+            loadPeraturan();
+            closeModal('modalPeraturan');
+        });
+
+        document.getElementById('jadwalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const jadwal = {
+                midweek: document.getElementById('midweek').value,
+                vesper: document.getElementById('vesper').value,
+                sabat: document.getElementById('sabat').value,
+                pa: document.getElementById('pa').value
+            };
+            
+            localStorage.setItem('jadwalIbadah', JSON.stringify(jadwal));
+            alert('Jadwal berhasil disimpan!');
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        init();
+    </script>
+</body>
+</html>
